@@ -1,5 +1,5 @@
 filebeat.prospectors:
-- input_type: log
+- type: log
   paths:
     - /mnt/log/*.log
 
