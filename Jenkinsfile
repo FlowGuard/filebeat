@@ -6,17 +6,19 @@ pipeline {
     stages {
         stage('Docker build & publish') {
             steps {
-                script {
-                    dockerImage = docker.build "docker.fg/flowguard/filebeat"
+                container('docker') {
+                    script {
+                        dockerImage = docker.build "docker.fg/flowguard/filebeat"
 
-                    bn = env.BUILD_NUMBER
-                    gitVersion = sh(script: 'git describe --tags --always', returnStdout: true).toString().trim()
-                    currentBuild.displayName = "#${bn}:${gitVersion}"
+                        bn = env.BUILD_NUMBER
+                        gitVersion = sh(script: 'git describe --tags --always', returnStdout: true).toString().trim()
+                        currentBuild.displayName = "#${bn}:${gitVersion}"
 
-                    if (env.BRANCH_NAME == "master") {
-                        dockerImage.push("latest")
-                    } else {
-                        dockerImage.push(gitVersion)
+                        if (env.BRANCH_NAME == "master") {
+                            dockerImage.push("latest")
+                        } else {
+                            dockerImage.push(gitVersion)
+                        }
                     }
                 }
             }
