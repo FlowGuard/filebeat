@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'kube-jenkins-agent' }
     options {
         ansiColor('xterm')
     }
@@ -9,11 +9,17 @@ pipeline {
                 container('docker') {
                     script {
                         dockerImage = docker.build "docker.fg/flowguard/filebeat"
-
+                    }
+                }    
+                container('jnlp') {
+                    script {
                         bn = env.BUILD_NUMBER
                         gitVersion = sh(script: 'git describe --tags --always', returnStdout: true).toString().trim()
                         currentBuild.displayName = "#${bn}:${gitVersion}"
-
+                    }    
+                } 
+                container('docker') {
+                    script {
                         if (env.BRANCH_NAME == "master") {
                             dockerImage.push("latest")
                         } else {
